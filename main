@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "datos.h"
+
+int main() {
+	/* declaro variables locales*/ 
+	char sel;
+	/*Printeo las 3 opciones y el salir */ 
+	 system("cls");
+	 printf("******************Selecciona una de las 4 opciones: **********************\n\n");
+	 printf(" 1. Comprobar e informar ips positivas: \n\n");
+	 printf(" 2. Muestra parte de la configuracion de red de la maquina local. \n\n");
+	 printf(" 3. Lanzar pings a dos dns y mostrar cual de los dos responde antes. \n\n");
+	 printf(" S. Salir\n\n");
+	 printf("\n\n  Selecciona una opcion...");
+
+	/*creo un do while para las diferentes opciones con un break para romper el bucle al sellecionar una y que abandona el bucle al poner s o S*/
+		do {
+			sel = getc(stdin);
+
+			switch (sel) {
+			case '1':
+				opcion1();
+				break;
+			case '2':
+				opcion2();
+				break;
+			case '3':
+				opcion3();
+				break;
+			case '4':
+				//salida 
+				break;
+			default:;
+				 
+			}
+		} while ((sel != 'S') && (sel != 's'));
+
+		return 0;
+}
