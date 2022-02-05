@@ -1,0 +1,375 @@
+#include <stdio.h>
+#include <string.h>
+
+void opcion1() {
+	/*declaro un puntero para leer DNSips.txt*/
+	FILE* fp;
+
+	/*declaro 4 contenedores para las 4 ips, uno para archivo que leera función leecad, otro para ping*/
+	char c[1500], c2[1500], c3[1500], c4[1500], fichero[400];
+
+	/* printeo mensaje indique ruta*/
+	printf("\n Indique ruta del archivo donde estan las ip's a leer: \n");
+	/*función leecad para leer strings sin partes en blanco*/
+	leecad(fichero, 1000);
+	printf("\n");
+
+	/*abro archivo modo read*/
+	fp = fopen(fichero, "r");
+	/* creo if por si fuera nulo al apuntador*/
+	if (fp == NULL) {
+		printf("Archivo no existe \n");
+	}
+	else {/*leo las 4 primeras lineas*/
+		fgets(c, 1500, fp);
+		fgets(c2, 1500, fp);
+		fgets(c3, 1500, fp);
+		fgets(c4, 1500, fp);
+	}
+	printf("*****Contenido del archivo: %s *************************************************\n", fichero);
+	printf("%s \n", c);
+	printf("%s \n", c2);
+	printf("%s \n", c3);
+	printf("%s \n", c4);
+}
+
+
+void opcion2() {
+	/*declaro contenedores para dns, nombre adaptador, ejecutar ipconfig y 16 lineas del ipconfig*/
+	char dns[100], adaptador[200], conf[100], linea0[100], linea1[100], linea2[100], linea3[100],
+		linea4[100], linea5[100], linea6[100], linea7[100], linea8[100], linea9[100], linea10[100], linea11[100],
+		linea12[100], linea13[100], linea14[100], linea15[100], linea16[100], a[10];;
+	/*declaro dos punteros*/
+	FILE* p1;
+	FILE* p2;
+
+	/*printeo mensaje para insertar adaptador*/
+	printf(" Inserte el nombre completo del adaptador (incluyendo los dos puntos finales) del que quiera conocer el DNS: \n");
+	/*función leecad para leer sin partes en blanco*/
+	leecad(adaptador, 1000);
+
+	/*copio ipconfig /all a char conf*/
+	strcpy(conf, "ipconfig /all ");
+	/*concateno para redirigir a dix.txt*/
+	strcat(conf, " > dix.txt");
+	/*lanzo a system*/
+	system(conf);
+
+	/*abro archivo de texto dix.txt en modo read apuntando con puntero p1*/
+	p1 = fopen("dix.txt", "r");
+
+	/*creo un while hasta que no sea final del archivo donde apunta p1*/
+	while (!feof(p1)) {
+		/*Voy leyendo lineas*/
+		fgets(linea0, 200, p1);
+		/*if con la funcion strstr en donde encuentre lo introducido en adaptador dentro de linea 0*/
+		if ((strstr(linea0, adaptador)) != NULL) {
+			/*guardo las 16 lineas siguientes*/
+			fgets(linea1, 200, p1);
+			fgets(linea2, 200, p1);
+			fgets(linea3, 200, p1);
+			fgets(linea4, 200, p1);
+			fgets(linea5, 200, p1);
+			fgets(linea6, 200, p1);
+			fgets(linea7, 200, p1);
+			fgets(linea8, 200, p1);
+			fgets(linea9, 200, p1);
+			fgets(linea10, 200, p1);
+			fgets(linea11, 200, p1);
+			fgets(linea12, 200, p1);
+			fgets(linea13, 200, p1);
+			fgets(linea14, 200, p1);
+			fgets(linea15, 200, p1);
+			fgets(linea16, 200, p1);
+		}
+		/*abro archivo de texto ip.txt en modo write apuntando con apuntador p2*/
+		p2 = fopen("ip.txt", "w");
+		/*printeo 4 lineas las cuales se crearan en el archivo*/
+		fprintf(p2, "%s", linea8);
+		fprintf(p2, "%s", linea9);
+		fprintf(p2, "%s", linea12);
+		fprintf(p2, "%s", linea16);
+		/*cierro flujo*/
+		fclose(p2);
+	}
+
+	/*Voy a linea donde salga primer dns*/
+	p1 = fopen("ip.txt", "r");
+	fgets(linea0, 100, p1);
+	fgets(linea10, 13, p1);
+	fgets(linea11, 13, p1);
+	fgets(linea12, 13, p1);
+	/*Voy a la parte de la linea donde aparece ip del DNS*/
+	fseek(p1, 243, SEEK_SET);
+	fgets(dns, 60, p1);
+	printf("El DNS actual es: %s", dns);
+	fclose(p1);
+
+	/*abro puntero apuntando a DNSipssi.txt en modo write*/
+	p1 = fopen("DNSipssi.txt", "w");
+	/*printeo linea 11*/
+	fprintf(p1, "%s", dns);
+	/*cierro flujo*/
+	fclose(p1);
+
+	FILE* fp;
+	FILE* fp2;
+
+	char c[1500], ping[100], borrar[200];
+
+	/* declaro entero para ping positivo y lo inicializo a 0*/
+	int pingresponde;
+	pingresponde = 0;
+	
+	fp = fopen("DNSips.txt", "r");
+	/* creo if por si fuera nulo el archivo*/
+	if (fp == NULL) {
+		printf("Archivo no existe \n");
+	}
+	else {	/*Creo un while dentro del else, hasta final del archivo y que vaya leyendo lineas*/
+		while (!feof(fp)) {
+		fgets(c, 1500, fp);
+		 /*le resto una posición para que no salga \0 final*/
+		c[strlen(c) - 1] = '\0';
+		/*funcion strcpy para copiar palabra ping en contenedor ping*/
+		strcpy(ping, "ping ");
+		/*concateno ping con ip guardada en c*/
+		strcat(ping, c);
+		/*concateno ping para redirigir a a.txt*/
+		strcat(ping, " > atemporal.txt");
+		/*ejecuto en system el ping*/
+		system(ping);
+		/*abro segundo puntero en modo read*/
+	fp2 = fopen("atemporal.txt", "r");
+	/*creo if por si el archivo fuera nulo*/
+	if (fp2 == NULL) {
+		printf("Archivo no existe \n");
+	}
+	else {/*leo las 11 primeras lineas hasta Tiempos aproximados*/
+		fgets(linea1, 100, fp2);
+		fgets(linea2, 100, fp2);
+		fgets(linea3, 100, fp2);
+		fgets(linea4, 100, fp2);
+		fgets(linea5, 100, fp2);
+		fgets(linea6, 100, fp2);
+		fgets(linea7, 100, fp2);
+		fgets(linea8, 100, fp2);
+		fgets(linea9, 100, fp2);
+		fgets(linea10, 100, fp2);
+		fgets(linea11, 100, fp2);
+		/*le quito el \0 final para la comparación*/
+		linea11[strlen(linea11) - 1] = '\0';
+		/*cierro flujo del segundo puntero*/
+		fclose(fp2);
+	}
+	/*creo un if con la función comparar, que compare la linea 11 y la frase de Tiempos aproximados de ida y vuelta en milisegundos:*/
+	if ((strcmp(linea11, "Tiempos aproximados de ida y vuelta en milisegundos:")) != NULL) {
+		pingresponde = 1;
+	}
+	if (pingresponde == 1) {/*if por si pingresponde es 1 nos hay comunicación*/
+		
+	}
+	else {/*else para si tiene comunicación*/
+		/*abro puntero apuntando a DNSipssi.txt en modo añadir (este es el archivo temporal que se pide borrar)*/
+		p1 = fopen("DNSipssi.txt", "a+");
+		/*printeo linea 11*/
+		fprintf(p1, "%s", c);
+		/*cierro flujo*/
+		fclose(p1);
+	}
+	/*reinicio contador de pingresponde*/
+	pingresponde = 0;
+	}
+		}
+		fclose(fp);
+	
+		
+		/*creo contenedores para dos ips, para ping, para las 11 lineas de ping, para las dos medias a comparar y los comandos necesarios para cambiar dns*/
+		char ip1[100], ip2[100], ping2[200], linea0x[100], linea1x[100], linea2x[100], linea3x[100], linea4x[100],
+			linea5x[100], linea6x[100], linea7x[100], linea8x[100], linea9x[100], linea10x[100], linea11x[100],
+			media1[60], media2[60], comando[100] = "netsh interface ipv4 set dnsservers ", comando2[100] = " primary", adaptador2[100] = "Wi-Fi static ";
+	
+			/*creo dos enteros para el retorno de la función atoi*/
+			int med1, med2;
+			/*declaro 4 punteros*/
+			FILE* p10;
+			FILE* p20;
+			FILE* p30;
+			FILE* p40;
+
+			/*abro archivo de texto DNSipssi en modo read*/
+			p10 = fopen("DNSipssi.txt", "r");
+			if (p10 == NULL) {
+				printf("Archivo no existe \n");
+			}
+			else {	/*leo las dos ips positivas*/
+				fgets(ip1, 100, p10);
+				fgets(ip2, 100, p10);
+			}
+			fclose(p1);
+			
+
+			ip1[strlen(ip1) - 1] = '\0';
+			/*funcion para copiar la palabra ping al contenedor ping*/
+			strcpy(ping2, "ping ");
+			/*concateno ping con la primera ip introducida*/
+			strcat(ping2, ip1);
+			/*concateno ping para redirigir a archivo dns.txt*/
+			strcat(ping2, " > dns.txt");
+			/*lanzo ping en system*/
+			system(ping2);
+
+			/* Hago la misma acción para la segunda ip y redirijo a archivo de texto dns2.txt*/
+			strcpy(ping2, "ping ");
+			strcat(ping2, ip2);
+			strcat(ping2, " > dns2.txt");
+			system(ping2);
+
+			/*abro puntero p1 apuntando a dns.txt en modo read*/
+			p10 = fopen("dns.txt", "r");
+			/*if por si apuntador es nulo*/
+			if (p10 == NULL) {
+				printf("Archivo no existe \n");
+			}
+			else/*else para leer 11 primeras lineas, hasta llegar a velocidad media*/
+			{
+				fgets(linea0x, 100, (FILE*)p10);
+				fgets(linea1x, 100, (FILE*)p10);
+				fgets(linea2x, 100, (FILE*)p10);
+				fgets(linea3x, 100, (FILE*)p10);
+				fgets(linea4x, 100, (FILE*)p10);
+				fgets(linea5x, 100, (FILE*)p10);
+				fgets(linea6x, 100, (FILE*)p10);
+				fgets(linea7x, 100, (FILE*)p10);
+				fgets(linea8x, 100, (FILE*)p10);
+				fgets(linea9x, 100, (FILE*)p10);
+				fgets(linea10x, 100, (FILE*)p10);
+				fgets(linea11x, 100, (FILE*)p10);
+				/*abro puntero apuntando a comps_dns.txt en modo write*/
+				p10 = fopen("comp_dns.txt", "w");
+				/*printeo linea 11*/
+				fprintf(p10, "%s", linea11x);
+				/*cierro flujo*/
+				fclose(p10);
+			}
+			/*Este es el momento en el que borro el archivo temporal DNSipssi.txt*/
+				strcpy(borrar, "del DNSipssi.txt");
+				system(borrar);
+			/*abro puntero apuntando a dns2.txt en modo read*/
+			p20 = fopen("dns2.txt", "r");
+			/*creo if por si fuera nulo*/
+			if (p20 == NULL) {
+				printf("Archivo no existe \n");
+			}
+			else
+			{	/*lee las 11 primeras lineas hasta llegar a media velocidad*/
+				fgets(linea0x, 100, (FILE*)p20);
+				fgets(linea1x, 100, (FILE*)p20);
+				fgets(linea2x, 100, (FILE*)p20);
+				fgets(linea3x, 100, (FILE*)p20);
+				fgets(linea4x, 100, (FILE*)p20);
+				fgets(linea5x, 100, (FILE*)p20);
+				fgets(linea6x, 100, (FILE*)p20);
+				fgets(linea7x, 100, (FILE*)p20);
+				fgets(linea8x, 100, (FILE*)p20);
+				fgets(linea9x, 100, (FILE*)p20);
+				fgets(linea10x, 100, (FILE*)p20);
+				fgets(linea11x, 100, (FILE*)p20);
+				/*abro segundo puntero apuntando a comp_dns2.txt en modo write*/
+				p20 = fopen("comp_dns2.txt", "w");
+				/*printeo la linea 11*/
+				fprintf(p20, "%s", linea11x);
+				/*cierro flujo*/
+				fclose(p20);
+			}
+
+			/*abro puntero p3 apuntando a archivo comp_dns.txt en modo read*/
+			p30 = fopen("comp_dns.txt", "r");
+			/*if por si fuera nulo*/
+			if (p30 == NULL) {
+				printf("Archivo no existe \n");
+			}
+			else
+			{	/*else situando en el string 9 que es donde esta media*/
+				fscanf(p30, "%s %s %s %s %s %s %s %s %s", a, a, a, a, a, a, a, a, media1);
+				/* le quito dos posiciones para que no salga ms*/
+				media1[strlen(media1) - 1] = '\0';
+				media1[strlen(media1) - 1] = '\0';
+				/*cierro flujo*/
+				fclose(p30);
+				/*con la función atoi transformo string en entero y se lo asigno a med1*/
+				med1 = atoi(media1);
+			}
+			/*realizo exactamente la misma operación para la otra velocidad media dentro de comp_dns2.txt*/
+			p40 = fopen("comp_dns2.txt", "r");
+			if (p40 == NULL) {
+				printf("Archivo no existe \n");
+			}
+			else
+			{	/*else para llegar al string 9, en donde esta la velocidad media*/
+				fscanf(p30, "%s %s %s %s %s %s %s %s %s", a, a, a, a, a, a, a, a, media2);
+				/*le quito dos posiciones respecto al \0*/
+				media2[strlen(media2) - 1] = '\0';
+				media2[strlen(media2) - 1] = '\0';
+				fclose(p40);
+				med2 = atoi(media2);
+			}
+			/*printeo las dos velocidades medias de las dos ips de cada servidor dns*/
+			printf("\n El servidor dns %s tiene una velocidad de: %d\n", ip1, med1);
+			printf("\n El servidor dns %s tiene una velocidad de: %d\n", ip2, med2);
+
+			/*creo un if para comparar los dos int*/
+			if (med1 < med2) {				/*si med1 es menor que med2 ip1 es mas rápido*/
+				printf("\n El servidor DNS mas rapido es: %s \n\n", ip1);
+				printf("El DNS no sufre cambios");
+				
+			}
+			else if (med2 < med1) {				/*si med2 es menor que med1 ip2 es más rápido*/
+				printf("\n El servidor DNS mas rapido es : %s \n\n", ip2);
+				printf("El DNS cambia al: %s", ip2);
+				/*concateno comando netsh con adaptador*/
+				strcat(comando, adaptador2 );
+				/*concateno con dirección ip más rápida*/
+				strcat(comando, ip1);
+				/*concateno con segundo comando*/
+				strcat(comando, comando2);
+				/*lanzo a system*/
+				system(comando);
+			}
+			else {								/*sino que se utilizaría cuando sean iguales, nos aparecera el mensaje de que tiene la misma velocidad*/
+				printf("\n Los dos servidores DNS tienen la misma velocidad");
+			}
+		
+}
+
+/*función leecad facilitada por el consultor*/
+int leecad(char* cad, int n) {
+
+	int i, c;
+	c = getchar();
+
+	if (c == EOF) {
+		cad[0] = '\0';
+		return 0;
+	}
+
+	if (c == '\n')
+		i = 0;
+	else {
+		cad[0] = c;
+		i = 1;
+	}
+	for (; i < n - 1 && (c = getchar()) != EOF && c != '\n'; i++)
+
+		cad[i] = c;
+
+	cad[i] = '\0';
+
+	if (c != '\n' && c != EOF)
+
+		while ((c = getchar()) != '\n' && c != EOF);
+
+	return 1;
+
+};
+
