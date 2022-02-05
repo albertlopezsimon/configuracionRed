@@ -1,0 +1,12 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "datos.h"
+
+int main() {
+	opcion1();
+	printf("\n");
+	opcion2();
+	printf("\n");
+	return 0;
+}
